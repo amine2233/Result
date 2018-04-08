@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 
 //! Project version number for Result.
-FOUNDATION_EXPORT double Result_iOSVersionNumber;
+FOUNDATION_EXPORT double Result_VersionNumber;
 
 //! Project version string for Result.
 FOUNDATION_EXPORT const unsigned char Result_VersionString[];
