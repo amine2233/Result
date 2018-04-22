@@ -48,6 +48,7 @@ public enum Result<Value, Error: Swift.Error>: ResultProtocol {
     }
 }
 
+// MARK: String Convertible
 extension Result : CustomStringConvertible {
     
     /// The textual representation used when written to an output stream, which includes whether the result was a
@@ -63,6 +64,7 @@ extension Result : CustomStringConvertible {
     }
 }
 
+// MARK: Debug String Convertible
 extension Result : CustomDebugStringConvertible {
     
     /// The debug textual representation used when written to an output stream, which includes whether the result was a
@@ -78,9 +80,8 @@ extension Result : CustomDebugStringConvertible {
     }
 }
 
+// MARK: Constructors
 extension Result {
-    
-    // MARK: Constructors
     
     /// Constructs a success wrapping a `value`.
     public init(value: Value) {
@@ -101,7 +102,11 @@ extension Result {
     public init(_ value: Value?, failWith: @autoclosure () -> Error) {
         self = value.map(Result.success) ?? .failure(failWith())
     }
-    
+}
+
+// MARK: Work with result
+extension Result {
+
     /// Get rsult value
     public var result: Result<Value, Error> {
         return self
@@ -148,6 +153,30 @@ extension Result {
     }
 }
 
+// MARK: Result work with throws
+public extension Result {
+    
+    /// Constructs a result from throwing completion, failing with `Error` if throwing error
+    public init(_ throwing: () throws -> Value) {
+        do {
+            self = .success(try throwing())
+        } catch {
+            self = .failure(error as! Error)
+        }
+    }
+    
+    /// Return value or catch error
+    public func convertThrow() throws -> Value {
+        switch self {
+        case .success(let value):
+            return value
+        case .failure(let error):
+            throw error
+        }
+    }
+}
+
+// MARK: Result recover
 public extension Result {
     
     // MARK: Higher-order functions
@@ -163,19 +192,11 @@ public extension Result {
         case .failure: return result()
         }
     }
-    
-    /// Return value or catch error
-    public func convertThrow() throws -> Value {
-        switch self {
-        case .success(let value):
-            return value
-        case .failure(let error):
-            throw error
-        }
-    }
 }
 
+// MARK: Result Equatable
 extension Result where Value: Equatable, Error: Equatable {
+    
     /// Returns `true` if `left` and `right` are both `Success`es and their values are equal, or if `left` and `right` are both `Failure`s and their errors are equal.
     public static func == (left: Result<Value, Error>, right: Result<Value, Error>) -> Bool {
         if let left = left.value, let right = right.value {
@@ -192,7 +213,9 @@ extension Result where Value: Equatable, Error: Equatable {
     }
 }
 
+// MARK: Result Optinal
 extension Result {
+    
     /// Returns the value of `left` if it is a `Success`, or `right` otherwise. Short-circuits.
     public static func ?? (left: Result<Value, Error>, right: @autoclosure () -> Value) -> Value {
         return left.recover(right())
