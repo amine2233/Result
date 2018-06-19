@@ -226,3 +226,17 @@ extension Result {
         return left.recover(with: right())
     }
 }
+
+// MARK: Result Resolve
+extension Result {
+    
+    /// Returns the value of .Success if it is a `Success`, or `Error` otherwise.
+    public func resolve() throws -> Value {
+        switch self {
+        case .success(let value):
+            return value
+        case .failure(let error):
+            throw error
+        }
+    }
+}

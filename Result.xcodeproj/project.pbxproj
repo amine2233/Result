@@ -567,6 +567,7 @@
 		673C56A4207A07DA004ED284 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 			};
 			name = Debug;
@@ -574,6 +575,7 @@
 		673C56A5207A07DA004ED284 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 			};
 			name = Release;
