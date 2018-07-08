@@ -6,7 +6,6 @@ public protocol ErrorConvertible: Swift.Error {
 }
 
 public extension Result where Error: ErrorConvertible {
-    
     /// Returns the result of applying `transform` to `Success`es’ values, or wrapping thrown errors.
     public func tryMap<U>(_ transform: (Value) throws -> U) -> Result<U, Error> {
         return flatMap { value in
