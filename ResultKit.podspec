@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-		s.name 				= "Result"
+		s.name 				= "ResultKit"
 		s.version 			= "1.1.2"
 		s.summary         	= "Sort description of 'Result' framework"
 	    s.homepage        	= "https://github.com/amine2233/Result"
@@ -16,5 +16,5 @@ Pod::Spec.new do |s|
     		'SWIFT_VERSION' => '4.1'
   		}
   		s.swift_version = '4.1'
-  		s.module_name = s.name
+  		s.module_name = "Result"
 	end
