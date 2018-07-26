@@ -2,11 +2,11 @@ import Foundation
 
 /// Result
 public enum Result<Value, Error: Swift.Error>: ResultProtocol {
+    
     case success(Value)
 
     case failure(Error)
 
-    /// Returns `true` if the result is a success, `false` otherwise.
     public var isSuccess: Bool {
         switch self {
         case .success:
@@ -16,7 +16,6 @@ public enum Result<Value, Error: Swift.Error>: ResultProtocol {
         }
     }
 
-    /// Returns `true` if the result is a failure, `false` otherwise.
     public var isFailure: Bool {
         switch self {
         case .failure:
@@ -26,7 +25,6 @@ public enum Result<Value, Error: Swift.Error>: ResultProtocol {
         }
     }
 
-    /// Returns the associated value if the result is a success, `nil` otherwise.
     public var value: Value? {
         switch self {
         case let .success(value):
@@ -36,7 +34,6 @@ public enum Result<Value, Error: Swift.Error>: ResultProtocol {
         }
     }
 
-    /// Returns the associated error value if the result is a failure, `nil` otherwise.
     public var error: Error? {
         switch self {
         case let .failure(error):
@@ -47,9 +44,20 @@ public enum Result<Value, Error: Swift.Error>: ResultProtocol {
     }
 }
 
+// MARK: ResultProtocol Extension add result in protocol
+
+extension ResultProtocol {
+    
+    /// Get result value
+    public var result: Result<Value,Error> {
+        return Result(value, failWith: error!)
+    }
+}
+
 // MARK: String Convertible
 
 extension Result: CustomStringConvertible {
+    
     /// The textual representation used when written to an output stream, which includes whether the result was a
     /// success or failure.
     public var description: String {
@@ -66,6 +74,7 @@ extension Result: CustomStringConvertible {
 // MARK: Debug String Convertible
 
 extension Result: CustomDebugStringConvertible {
+    
     /// The debug textual representation used when written to an output stream, which includes whether the result was a
     /// success or failure in addition to the value or error.
     public var debugDescription: String {
@@ -82,6 +91,7 @@ extension Result: CustomDebugStringConvertible {
 // MARK: Constructors
 
 extension Result {
+    
     /// Constructs a success wrapping a `value`.
     public init(value: Value) {
         self = .success(value)
@@ -106,11 +116,30 @@ extension Result {
 // MARK: Work with result
 
 extension Result {
+    
     /// Get rsult value
     public var result: Result<Value, Error> {
         return self
     }
 
+    /// Returns the result of applying `transform` with optional value to `Success`es’ values,
+    /// or re-wrapping `Failure`’s errors.
+    public func compactMap<U>(_ transform: (Value?) -> U) -> Result<U, Error> {
+        switch self {
+        case let .success(value): return .success(transform(value))
+        case let .failure(error): return .failure(error)
+        }
+    }
+    
+    /// Returns a new Result by mapping `Failure`'s with optional value to `transform`,
+    /// or re-wrapping `Success`’s errors.
+    public func compactMapError<E: Swift.Error>(_ transform: (Error?) -> E) -> Result<Value, E> {
+        switch self {
+        case let .success(value): return .success(value)
+        case let .failure(error): return .failure(transform(error))
+        }
+    }
+    
     /// Returns the result of applying `transform` to `Success`es’ values, or re-wrapping `Failure`’s errors.
     public func flatMap<U>(_ transform: (Value) -> Result<U, Error>) -> Result<U, Error> {
         switch self {
@@ -155,6 +184,7 @@ extension Result {
 // MARK: Result work with throws
 
 public extension Result {
+    
     /// Constructs a result from throwing completion, failing with `Error` if throwing error
     public init(_ throwing: () throws -> Value) {
         do {
@@ -175,11 +205,9 @@ public extension Result {
     }
 }
 
-// MARK: Result recover
+// MARK: Result recover & Higher-order functions
 
 public extension Result {
-
-    // MARK: Higher-order functions
 
     /// Returns `self.value` if this result is a .Success, or the given value otherwise. Equivalent with `??`
     public func recover(_ value: @autoclosure () -> Value) -> Value {
@@ -198,6 +226,7 @@ public extension Result {
 // MARK: Result Equatable
 
 extension Result where Value: Equatable, Error: Equatable {
+    
     /// Returns `true` if `left` and `right` are both `Success`es and their values are equal, or if `left` and `right` are both `Failure`s and their errors are equal.
     public static func == (left: Result<Value, Error>, right: Result<Value, Error>) -> Bool {
         if let left = left.value, let right = right.value {
@@ -217,6 +246,7 @@ extension Result where Value: Equatable, Error: Equatable {
 // MARK: Result Optinal
 
 extension Result {
+    
     /// Returns the value of `left` if it is a `Success`, or `right` otherwise. Short-circuits.
     public static func ?? (left: Result<Value, Error>, right: @autoclosure () -> Value) -> Value {
         return left.recover(right())
@@ -231,6 +261,7 @@ extension Result {
 // MARK: Result Resolve
 
 extension Result {
+    
     /// Returns the value of .Success if it is a `Success`, or `Error` otherwise.
     public func resolve() throws -> Value {
         switch self {
@@ -239,5 +270,74 @@ extension Result {
         case let .failure(error):
             throw error
         }
+    }
+}
+
+extension Result {
+    
+    public init(block: () throws -> Value) {
+        do {
+            self = try .success(block())
+        } catch let error {
+            self = .failure(error as! Error)
+        }
+    }
+    
+    /**
+     Transform a result into another result using a function. If the result was an error,
+     the function will not be executed and the error returned instead.
+     */
+    public func map<U,Error>(_ f: @escaping (Value) -> U) -> Result<U,Error> {
+        switch self {
+        case let .success(v): return .success(f(v))
+        case let .failure(error): return .failure(error as! Error)
+        }
+    }
+    
+    /**
+     Transform a result into another result using a function. If the result was an error,
+     the function will not be executed and the error returned instead.
+     */
+    public func flatMap<U,Error>(_ f: (Value) -> Result<U,Error>) -> Result<U,Error> {
+        switch self {
+        case let .success(v): return f(v)
+        case let .failure(error): return .failure(error as! Error)
+        }
+    }
+    
+    /**
+     Transform a result into another result using a function. If the result was an error,
+     the function will not be executed and the error returned instead.
+     */
+    public func flatMap<U,Error>(_ f: (Value) throws -> U) -> Result<U,Error> {
+        return flatMap { t in
+            do {
+                return .success(try f(t))
+            } catch let error {
+                return .failure(error as! Error)
+            }
+        }
+    }
+    /**
+     Transform a result into another result using a function. If the result was an error,
+     the function will not be executed and the error returned instead.
+     */
+    public func flatMap<U,Error>(_ f:@escaping (Value, (@escaping(Result<U,Error>)->Void))->Void) -> (@escaping(Result<U,Error>)->Void)->Void {
+        return { g in
+            switch self {
+            case let .success(v): f(v, g)
+            case let .failure(error): g(.failure(error as! Error))
+            }
+        }
+    }
+}
+
+/**
+ Provide a default value for failed results.
+ */
+public func ?? <Value,Error> (result: Result<Value,Error>, defaultValue: @autoclosure () -> Value) -> Value {
+    switch result {
+    case .success(let x): return x
+    case .failure: return defaultValue()
     }
 }

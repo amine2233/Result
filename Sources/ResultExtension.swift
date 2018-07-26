@@ -1,7 +1,8 @@
 import Foundation
 
 public extension Result where Error: Semigroup {
-    public func apply<U>(_ transform: Result < (Value) -> U, Error>) -> Result<U, Error> {
+    
+    public func apply<U>(_ transform: Result <(Value) -> U, Error>) -> Result<U, Error> {
         switch (transform, self) {
         case let (.success(f), _): return map(f)
         case let (.failure(e), .success): return .failure(e)
