@@ -1,12 +1,12 @@
 import Foundation
 
 public extension Result where Error: Semigroup {
-    
+
     public func apply<U>(_ transform: Result <(Value) -> U, Error>) -> Result<U, Error> {
         switch (transform, self) {
-        case let (.success(f), _): return map(f)
-        case let (.failure(e), .success): return .failure(e)
-        case let (.failure(e1), .failure(e2)): return .failure(e1 <> e2)
+        case let (.success(value), _): return map(value)
+        case let (.failure(error), .success): return .failure(error)
+        case let (.failure(error1), .failure(error2)): return .failure(error1 <> error2)
         }
     }
 
@@ -14,7 +14,7 @@ public extension Result where Error: Semigroup {
         switch (self, `default`) {
         case (.success, _): return self
         case (_, .success): return `default`
-        case let (.failure(e1), .failure(e2)): return .failure(e1 <> e2)
+        case let (.failure(error1), .failure(error2)): return .failure(error1 <> error2)
         }
     }
 

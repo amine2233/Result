@@ -1,7 +1,7 @@
 @testable import Result
 import XCTest
 
-class Reusable_Tests: XCTestCase {
+class ReusableTests: XCTestCase {
     func testIdentifier() {
     }
 }
