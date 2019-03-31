@@ -183,7 +183,7 @@ extension Result {
 
 // MARK: Result work with throws
 
-public extension Result {
+extension Result {
 
     /// Constructs a result from throwing completion, failing with `Error` if throwing error
     public init(_ throwing: () throws -> Value) {
@@ -207,7 +207,7 @@ public extension Result {
 
 // MARK: Result recover & Higher-order functions
 
-public extension Result {
+extension Result {
 
     /// Returns `self.value` if this result is a .Success, or the given value otherwise. Equivalent with `??`
     public func recover(_ value: @autoclosure () -> Value) -> Value {

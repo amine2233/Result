@@ -1,6 +1,6 @@
 import Foundation
 
-public extension Result where Error: Semigroup {
+extension Result where Error: Semigroup {
 
     public func apply<U>(_ transform: Result <(Value) -> U, Error>) -> Result<U, Error> {
         switch (transform, self) {

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 		s.name 				= "ResultKit"
-		s.version 			= "2.2.0"
+		s.version 			= "2.3.0"
 		s.summary         	= "Sort description of 'Result' framework"
 	    s.homepage        	= "https://github.com/amine2233/Result"
 	    s.license           = { type: 'MIT', file: 'LICENSE' }
