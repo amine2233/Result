@@ -36,3 +36,6 @@ xcuserdata/
 Carthage/Checkouts
 Carthage/Build
 
+# Swift SPM
+.swiftpm
+.build

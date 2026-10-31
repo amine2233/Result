@@ -3,16 +3,16 @@ import Foundation
 public protocol ResultProtocol {
 
     /// Generic Value
-    associatedtype Value
+    associatedtype Success
 
     /// Generic Error Value
-    associatedtype Error: Swift.Error
+    associatedtype Failure: Swift.Error
 
     /// Constructs a success wrapping a `value`.
-    init(value: Value)
+    init(value: Success)
 
     /// Constructs a failure wrapping an `error`.
-    init(failure: Error)
+    init(failure: Failure)
 
     /// Returns `true` if the result is a success, `false` otherwise.
     var isSuccess: Bool { get }
@@ -21,8 +21,8 @@ public protocol ResultProtocol {
     var isFailure: Bool { get }
 
     /// Returns the associated value if the result is a success, `nil` otherwise.
-    var value: Value? { get }
+    var value: Success? { get }
 
     /// Returns the associated error value if the result is a failure, `nil` otherwise.
-    var error: Error? { get }
+    var error: Failure? { get }
 }

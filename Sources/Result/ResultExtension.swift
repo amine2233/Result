@@ -1,8 +1,8 @@
 import Foundation
 
-extension Result where Error: Semigroup {
+extension Result where Failure: Semigroup {
 
-    public func apply<U>(_ transform: Result <(Value) -> U, Error>) -> Result<U, Error> {
+    public func apply<U>(_ transform: Result<(Success) -> U, Failure>) -> Result<U, Failure> {
         switch (transform, self) {
         case let (.success(value), _): return map(value)
         case let (.failure(error), .success): return .failure(error)
@@ -34,7 +34,7 @@ extension Result where Error: Semigroup {
         return lhs.and(rhs)
     }
 
-    public static func <*> <B>(lhs: Result < (Value) -> B, Error>, rhs: Result<Value, Error>) -> Result<B, Error> {
+    public static func <*> <B>(lhs: Result<(Success) -> B, Failure>, rhs: Result<Success, Failure>) -> Result<B, Failure> {
         return rhs.apply(lhs)
     }
 }
